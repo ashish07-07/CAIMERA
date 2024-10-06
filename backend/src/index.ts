@@ -31,7 +31,7 @@ function Startnewround() {
   gameOver = false;
 
   if (usercount.size >= 2) {
-    if (currentquestioncount < 2) {
+    if (currentquestioncount < 5) {
       io.emit("gamestartaware", {
         message: "Gameover notification",
       });
