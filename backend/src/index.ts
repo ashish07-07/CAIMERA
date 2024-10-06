@@ -82,7 +82,13 @@ function Startnewround() {
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:3001"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3001",
+      "https://caimera-gamma.vercel.app",
+      "https://caimera-git-main-ashish07-07s-projects.vercel.app",
+      "https://caimera-ae52qtlfs-ashish07-07s-projects.vercel.app",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
