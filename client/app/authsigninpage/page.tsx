@@ -9,7 +9,6 @@ export default function SignIn() {
     name: "",
     email: "",
     password: "",
-    // phonenumber: "",
   });
 
   const router = useRouter();
@@ -19,7 +18,7 @@ export default function SignIn() {
 
     const res = await signIn("credentials", {
       ...credentials,
-      redirect: false, // Disable redirect to manually handle error/success
+      redirect: false,
     });
 
     if (res?.error) {
