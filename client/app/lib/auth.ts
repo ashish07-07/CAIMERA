@@ -27,10 +27,10 @@ export const NEXT_AUTH = {
         try {
           const response = await axios.post(
             "http://3.110.101.31:3000/user/userregistration",
+
             {
               name,
               email,
-
               password: hashedPassword,
             }
           );
