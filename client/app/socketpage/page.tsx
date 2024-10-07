@@ -55,7 +55,7 @@ export default function Socketre() {
     }
     // const socket = io("http://localhost:3000");
     // const socket = io(process.env.AWS_HOSTED_URL);
-    const socket = io("http://3.110.101.31:3000");
+    const socket = io("https://3.110.101.31:3000");
 
     console.log(socket);
 
