@@ -26,7 +26,7 @@ export const NEXT_AUTH = {
 
         try {
           const response = await axios.post(
-            "https://3.110.101.31:3000/user/userregistration",
+            "http://3.110.101.31:3000/user/userregistration",
             {
               name,
               email,
