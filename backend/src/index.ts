@@ -26,8 +26,8 @@ let roundTimer: NodeJS.Timeout | null = null;
 
 app.use("/user", userlogin);
 
-app.get("/", function () {
-  console.log("HELLO");
+app.get("/", (req, res) => {
+  res.send("Welcome to the Quiz Server!");
 });
 
 function Startnewround() {
