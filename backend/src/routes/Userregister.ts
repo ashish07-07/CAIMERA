@@ -33,3 +33,29 @@ router.post("/userregistration", async function (req: any, res: any) {
 });
 
 export default router;
+
+// router.post("/userlogin", async function (req: any, res: any) {
+//   const { email, password }: { email: string; password: string } = req.body;
+
+//   const user = await prisma.user.findUnique({
+//     where: { email },
+//   });
+
+//   if (!user) {
+//     return res.status(401).json({ error: "Invalid email or password" });
+//   }
+
+//   const isPasswordValid = await bcrypt.compare(password, user.password);
+
+//   if (!isPasswordValid) {
+//     return res.status(401).json({ error: "Invalid email or password" });
+//   }
+
+//   return res.status(200).json({
+//     user: {
+//       id: user.id.toString(),
+//       email: user.email,
+//       name: user.name,
+//     },
+//   });
+// });
