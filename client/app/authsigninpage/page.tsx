@@ -25,6 +25,8 @@ export default function SignIn() {
     if (res?.error) {
       console.log("error having");
       console.error(res.error);
+      console.log(res);
+      console.log(credentials);
     } else {
       router.push("/");
     }
