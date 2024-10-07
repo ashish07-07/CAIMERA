@@ -26,7 +26,7 @@ export const NEXT_AUTH = {
 
         try {
           const response = await axios.post(
-            `  ${process.env.AWS_HOSTED_URL}/user/userregistration `,
+            `${process.env.AWS_HOSTED_URL}/user/userregistration`,
             {
               name,
               email,
