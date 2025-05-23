@@ -243,7 +243,7 @@ const handler = NextAuth({
       },
       async authorize(credentials: any) {
         try {
-          const res = await axios.post("http://localhost:3000/user/getuserbyemail", {
+          const res = await axios.post("/user/getuserbyemail", {
             email: credentials.email,
           });
 
