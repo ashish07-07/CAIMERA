@@ -23,9 +23,13 @@ export default function Tabletopper() {
       // const leaderboarddetails = await axios.get(
       //   "http://localhost:3000/ranking/leaderboard"
       // );
+      // const leaderboarddetails = await axios.get(
+      //   `${process.env.AWS_HOSTED_URL}/ranking/leaderboard`
+      // );
       const leaderboarddetails = await axios.get(
-        `${process.env.AWS_HOSTED_URL}/ranking/leaderboard`
-      );
+  'https://caimera-2.onrender.com/ranking/leaderboard'
+);
+
       console.log(leaderboarddetails);
 
       setleaderboarddetails(leaderboarddetails.data.leaderboard);

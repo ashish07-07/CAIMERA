@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { NEXT_AUTH } from "@/app/lib/auth";
 
+
+
 const handler = NextAuth(NEXT_AUTH);
 
 export const GET = handler;
