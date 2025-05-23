@@ -13,22 +13,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user{
+// model user{
 
-   id Int @id  @default(autoincrement())
-   name String
-   email String @unique
-   password String
-   scores  Score[]  
+//    id Int @id  @default(autoincrement())
+//    name String
+//    email String @unique
+//    password String
+//    scores  Score[]  
 
+// }
+
+
+// model Score {
+//   id      Int    @id @default(autoincrement())
+//   userId  Int   
+//   score    Int    @default(0) 
+//   user     user   @relation(fields: [userId], references: [id]) 
+
+//   @@unique([userId]) 
+// }
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String
+  password String
+  scores   Score[]  
 }
 
-
 model Score {
-  id      Int    @id @default(autoincrement())
-  userId  Int   
-  score    Int    @default(0) 
-  user     user   @relation(fields: [userId], references: [id]) 
-
-  @@unique([userId]) 
+  id     Int   @id @default(autoincrement())
+  userId Int
+  score  Int   @default(0)
+  user   User  @relation(fields: [userId], references: [id])
 }
