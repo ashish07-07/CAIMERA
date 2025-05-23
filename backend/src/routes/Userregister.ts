@@ -1,38 +1,38 @@
-import express from "express";
-import prisma from "../db";
+// import express from "express";
+// import prisma from "../db";
 
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 
-interface Userdetails {
-  name: string;
-  email: string;
-  password: string;
-}
+// interface Userdetails {
+//   name: string;
+//   email: string;
+//   password: string;
+// }
 
-const router = express.Router();
-router.use(express.json());
+// const router = express.Router();
+// router.use(express.json());
 
-router.post("/userregistration", async function (req: any, res: any) {
-  const { name, email, password }: Userdetails = req.body;
+// router.post("/userregistration", async function (req: any, res: any) {
+//   const { name, email, password }: Userdetails = req.body;
 
-  console.log(`the name is ${name} and email is ${email} `);
+//   console.log(`the name is ${name} and email is ${email} `);
 
-  const encryptedpassword = await bcrypt.hash(password, 10);
+//   const encryptedpassword = await bcrypt.hash(password, 10);
 
-  const userdetails = await prisma.user.create({
-    data: {
-      name: name,
-      email: email,
-      password: encryptedpassword,
-    },
-  });
+//   const userdetails = await prisma.user.create({
+//     data: {
+//       name: name,
+//       email: email,
+//       password: encryptedpassword,
+//     },
+//   });
 
-  return res.status(201).json({
-    user: userdetails,
-  });
-});
+//   return res.status(201).json({
+//     user: userdetails,
+//   });
+// });
 
-export default router;
+// export default router;
 
 
 // import express, { Request, Response } from "express";
@@ -125,3 +125,91 @@ export default router;
 //     },
 //   });
 // });
+
+
+import express from "express";
+import prisma from "../db";
+import bcrypt from "bcrypt";
+import cors from "cors";
+
+const router = express.Router();
+
+// Add CORS middleware
+router.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true
+}));
+
+router.use(express.json());
+
+interface UserDetails {
+  name: string;
+  email: string;
+  password: string;
+}
+
+// Improved error handling middleware
+const handleErrors = (res: express.Response, status: number, message: string) => {
+  return res.status(status).json({ success: false, error: message });
+};
+
+router.post("/userregistration", async (req:any, res:any) => {
+  try {
+    const { name, email, password }: UserDetails = req.body;
+
+    // Validate input
+    if (!name || !email || !password) {
+      return handleErrors(res, 400, "All fields are required");
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return handleErrors(res, 400, "Invalid email format");
+    }
+
+    // Check password strength
+    if (password.length < 8) {
+      return handleErrors(res, 400, "Password must be at least 8 characters long");
+    }
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      return handleErrors(res, 409, "User with this email already exists");
+    }
+
+    // Hash password
+    const saltRounds = process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS) : 10;
+    const encryptedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create new user
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: encryptedPassword,
+      },
+      select: {  // Exclude sensitive fields
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true
+      }
+    });
+
+    return res.status(201).json({
+      success: true,
+      user: newUser
+    });
+
+  } catch (error) {
+    console.error("Registration error:", error);
+    return handleErrors(res, 500, "Internal server error");
+  }
+});
+
+export default router;

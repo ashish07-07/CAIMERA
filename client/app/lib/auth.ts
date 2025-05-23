@@ -83,6 +83,65 @@
 //   },
 // };
 
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import axios from 'axios';
+
+export const authOptions = {
+  providers: [
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        try {
+          const response = await axios.post(
+            `${process.env.BACKEND_URL}/api/login`,
+            {
+              email: credentials?.email,
+              password: credentials?.password
+            }
+          );
+
+          if (response.data) {
+            return {
+              id: response.data.id.toString(),
+              email: response.data.email,
+              name: response.data.name
+            };
+          }
+          return null;
+        } catch (error) {
+          console.error('Authorization error:', error);
+          return null;
+        }
+      }
+    })
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+      }
+      return token;
+    },
+    async session({ session, token }: any) {
+      session.user.id = token.id;
+      session.user.name = token.name;
+      return session;
+    }
+  },
+  pages: {
+    signIn: '/signin'
+  }
+};
+
+export default NextAuth(authOptions);
+
 
 // app/api/auth/[...nextauth]/route.ts (for Next.js App Router)
 // import NextAuth from "next-auth";
@@ -226,61 +285,3 @@
 //   },
 // };
 
-
-// pages/api/auth/[...nextauth].ts
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import axios from "axios";
-import bcrypt from "bcrypt";
-
-const handler = NextAuth({
-  providers: [
-    CredentialsProvider({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials: any) {
-        try {
-          const res = await axios.post("/user/getuserbyemail", {
-            email: credentials.email,
-          });
-
-          const user = res.data.user;
-
-          if (!user) return null;
-
-          const isPasswordCorrect = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
-
-          if (!isPasswordCorrect) {
-            console.error("Wrong password");
-            return null;
-          }
-
-          // Do not return password
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-          };
-        } catch (error) {
-          console.error("Auth error:", error);
-          return null;
-        }
-      },
-    }),
-  ],
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/signin",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-});
-
-export { handler as GET, handler as POST };
