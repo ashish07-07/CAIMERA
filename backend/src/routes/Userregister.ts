@@ -127,14 +127,106 @@
 // });
 
 
-import express from "express";
-import prisma from "../db";
-import bcrypt from "bcrypt";
-import cors from "cors";
+// import express from "express";
+// import prisma from "../db";
+// import bcrypt from "bcrypt";
+// import cors from "cors";
+// import { emit } from "process";
+
+// const router = express.Router();
+
+// // Add CORS middleware
+// router.use(cors({
+//   origin: process.env.FRONTEND_URL || "http://localhost:3000",
+//   credentials: true
+// }));
+
+// router.use(express.json());
+
+// interface UserDetails {
+//   name: string;
+//   email: string;
+//   password: string;
+// }
+
+// // Improved error handling middleware
+// const handleErrors = (res: express.Response, status: number, message: string) => {
+//   return res.status(status).json({ success: false, error: message });
+// };
+
+// router.post("/userregistration", async (req:any, res:any) => {
+//   try {
+//     const { name, email, password }: UserDetails = req.body;
+
+//     // Validate input
+//     if (!name || !email || !password) {
+//       return handleErrors(res, 400, "All fields are required");
+//     }
+
+//     // Validate email format
+//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     if (!emailRegex.test(email)) {
+//       return handleErrors(res, 400, "Invalid email format");
+//     }
+
+//     // Check password strength
+//     if (password.length < 8) {
+//       return handleErrors(res, 400, "Password must be at least 8 characters long");
+//     }
+
+//     // Check if user already exists
+//     const existingUser = await prisma.user.findUnique({
+//       where:
+//       {
+//         email:email
+//       }
+//     });
+
+//     if (existingUser) {
+//       return handleErrors(res, 409, "User with this email already exists");
+//     }
+
+//     // Hash password
+//     const saltRounds = process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS) : 10;
+//     const encryptedPassword = await bcrypt.hash(password, saltRounds);
+
+//     // Create new user
+//     const newUser = await prisma.user.create({
+//       data: {
+//         name,
+//         email,
+//         password: encryptedPassword,
+//       },
+//       select: {  // Exclude sensitive fields
+//         id: true,
+//         name: true,
+//         email: true,
+//           created_at: true
+//       }
+//     });
+
+//     return res.status(201).json({
+//       success: true,
+//       user: newUser
+//     });
+
+//   } catch (error) {
+//     console.error("Registration error:", error);
+//     return handleErrors(res, 500, "Internal server error");
+//   }
+// });
+
+// export default router;
+
+
+// src/routes/Userregister.ts
+import express from 'express';
+import prisma from '../db';
+import bcrypt from 'bcrypt';
+import cors from 'cors';
 
 const router = express.Router();
 
-// Add CORS middleware
 router.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:3000",
   credentials: true
@@ -148,67 +240,48 @@ interface UserDetails {
   password: string;
 }
 
-// Improved error handling middleware
-const handleErrors = (res: express.Response, status: number, message: string) => {
-  return res.status(status).json({ success: false, error: message });
-};
-
 router.post("/userregistration", async (req:any, res:any) => {
   try {
     const { name, email, password }: UserDetails = req.body;
 
     // Validate input
     if (!name || !email || !password) {
-      return handleErrors(res, 400, "All fields are required");
+      return res.status(400).json({ error: "All fields are required" });
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return handleErrors(res, 400, "Invalid email format");
-    }
-
-    // Check password strength
-    if (password.length < 8) {
-      return handleErrors(res, 400, "Password must be at least 8 characters long");
-    }
-
-    // Check if user already exists
+    // Check existing user
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { 
+        email: email 
+      }
     });
 
     if (existingUser) {
-      return handleErrors(res, 409, "User with this email already exists");
+      return res.status(409).json({ error: "Email already exists" });
     }
 
     // Hash password
-    const saltRounds = process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS) : 10;
-    const encryptedPassword = await bcrypt.hash(password, saltRounds);
+    const encryptedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
+    // Create user
     const newUser = await prisma.user.create({
       data: {
         name,
         email,
         password: encryptedPassword,
       },
-      select: {  // Exclude sensitive fields
+      select: {
         id: true,
         name: true,
-        email: true,
-        createdAt: true
+        email: true
       }
     });
 
-    return res.status(201).json({
-      success: true,
-      user: newUser
-    });
+    return res.status(201).json(newUser);
 
   } catch (error) {
     console.error("Registration error:", error);
-    return handleErrors(res, 500, "Internal server error");
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
