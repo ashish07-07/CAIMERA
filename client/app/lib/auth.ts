@@ -87,7 +87,7 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import axios from 'axios';
 
-export const authOptions = {
+export const NEXT_AUTH = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -97,13 +97,21 @@ export const authOptions = {
       },
       async authorize(credentials) {
         try {
+          // const response = await axios.post(
+          //   `${process.env.BACKEND_URL}/api/login`,
+          //   {
+          //     email: credentials?.email,
+          //     password: credentials?.password
+          //   }
+          // );
           const response = await axios.post(
-            `${process.env.BACKEND_URL}/api/login`,
-            {
-              email: credentials?.email,
-              password: credentials?.password
-            }
-          );
+  'https://caimera-4.onrender.com/user/userregistration',
+  {
+   
+    email: credentials?.email,
+    password: credentials?.password // Send plain password
+  }
+);
 
           if (response.data) {
             return {
@@ -140,7 +148,7 @@ export const authOptions = {
   }
 };
 
-export default NextAuth(authOptions);
+// export default NextAuth(authOptions);
 
 
 // app/api/auth/[...nextauth]/route.ts (for Next.js App Router)
@@ -218,6 +226,7 @@ export default NextAuth(authOptions);
 // import CredentialsProvider from "next-auth/providers/credentials";
 // import bcrypt from "bcrypt";
 // import axios from "axios";
+// import { NEXT_AUTH } from '@/app/lib/auth';
 
 // export const NEXT_AUTH = {
 //   providers: [

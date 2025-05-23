@@ -240,26 +240,68 @@ interface UserDetails {
   password: string;
 }
 
+// router.post("/userregistration", async (req:any, res:any) => {
+//   try {
+//     const { name, email, password }: UserDetails = req.body;
+
+//     // Validate input
+//     if (!name || !email || !password) {
+//       return res.status(400).json({ error: "All fields are required" });
+//     }
+
+//     // Check existing user
+//     // @ts-ignore
+//     const existingUser = await prisma.user.findUnique({
+//       where: { 
+//         email: email 
+//       }
+//     });
+
+// //     const existingUser = await prisma.user.findUnique({
+// //   where: { email }
+// // });
+
+//     if (existingUser) {
+//       return res.status(409).json({ error: "Email already exists" });
+//     }
+
+//     // Hash password
+//     const encryptedPassword = await bcrypt.hash(password, 10);
+
+//     // Create user
+//     const newUser = await prisma.user.create({
+//       data: {
+//         name,
+//         email,
+//         password: encryptedPassword,
+//       },
+//       select: {
+//         id: true,
+//         name: true,
+//         email: true
+//       }
+//     });
+
+//     return res.status(201).json(newUser);
+
+//   } catch (error) {
+//     console.error("Registration error:", error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 router.post("/userregistration", async (req:any, res:any) => {
   try {
-    const { name, email, password }: UserDetails = req.body;
+    const { name, email, password } = req.body;
 
-    // Validate input
+    // Enhanced validation
     if (!name || !email || !password) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     // Check existing user
-    // @ts-ignore
     const existingUser = await prisma.user.findUnique({
-      where: { 
-        email: email 
-      }
+      where: { email }
     });
-
-//     const existingUser = await prisma.user.findUnique({
-//   where: { email }
-// });
 
     if (existingUser) {
       return res.status(409).json({ error: "Email already exists" });
@@ -289,5 +331,4 @@ router.post("/userregistration", async (req:any, res:any) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-
 export default router;
