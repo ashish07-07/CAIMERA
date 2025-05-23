@@ -213,9 +213,103 @@
 
 
 
+// "use client";
+// import { useState } from 'react';
+// import { useRouter } from 'next/navigation';
+// import axios from 'axios';
+
+// export default function SignUpPage() {
+//   const router = useRouter();
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     email: '',
+//     password: '',
+//   });
+//   const [error, setError] = useState('');
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     setError('');
+
+//     try {
+//       // Directly call your backend signup endpoint
+//       const response = await axios.post(
+//         'https://caimera-4.onrender.com/user/userregistration',
+//         {
+//           name: formData.name,
+//           email: formData.email,
+//           password: formData.password
+//         }
+//       );
+
+//       // If registration successful, redirect to home
+//       if (response.status === 201) {
+//         router.push('/');
+//       }
+//     } catch (err: any) {
+//       setError(err.response?.data?.error || 'Registration failed');
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+//       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-96">
+//         <h1 className="text-2xl font-bold mb-6 text-center">
+//           Create Account
+//         </h1>
+
+//         {error && (
+//           <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>
+//         )}
+
+//         <div className="mb-4">
+//           <label className="block text-sm font-medium mb-1">Name</label>
+//           <input
+//             type="text"
+//             value={formData.name}
+//             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+//             className="w-full p-2 border rounded"
+//             required
+//           />
+//         </div>
+
+//         <div className="mb-4">
+//           <label className="block text-sm font-medium mb-1">Email</label>
+//           <input
+//             type="email"
+//             value={formData.email}
+//             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+//             className="w-full p-2 border rounded text-black"
+//             required
+//           />
+//         </div>
+
+//         <div className="mb-6">
+//           <label className="block text-sm font-medium mb-1 text-black">Password</label>
+//           <input
+//             type="password"
+//             value={formData.password}
+//             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+//             className="w-full p-2 border rounded text-black"
+//             required
+//           />
+//         </div>
+
+//         <button
+//           type="submit"
+//           className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+//         >
+//           Sign Up
+//         </button>
+//       </form>
+//     </div>
+//   );
+// }
+
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import axios from 'axios';
 
 export default function SignUpPage() {
@@ -232,8 +326,8 @@ export default function SignUpPage() {
     setError('');
 
     try {
-      // Directly call your backend signup endpoint
-      const response = await axios.post(
+      // Register user
+      await axios.post(
         'https://caimera-4.onrender.com/user/userregistration',
         {
           name: formData.name,
@@ -242,8 +336,16 @@ export default function SignUpPage() {
         }
       );
 
-      // If registration successful, redirect to home
-      if (response.status === 201) {
+      // Auto-login after registration
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (result?.error) {
+        setError('Auto-login failed after registration');
+      } else {
         router.push('/');
       }
     } catch (err: any) {
@@ -279,18 +381,18 @@ export default function SignUpPage() {
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-black"
             required
           />
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-1">Password</label>
+          <label className="block text-sm font-medium mb-1 text-black">Password</label>
           <input
             type="password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-black"
             required
           />
         </div>

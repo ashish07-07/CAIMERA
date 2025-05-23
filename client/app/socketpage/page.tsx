@@ -48,15 +48,15 @@ export default function Socketre() {
       return;
     }
 
-    if (!session || !session.user) {
-      console.log("Not logged in, redirecting...");
-      router.push("/authsigninpage");
-      return;
-    }
+    // if (!session || !session.user) {
+    //   console.log("Not logged in, redirecting...");
+    //   router.push("/authsigninpage");
+    //   return;
+    // }
     // const socket = io("http://localhost:3000");
     // const socket = io(process.env.AWS_HOSTED_URL);
     // const socket = io("https://3.110.101.31:3000");
-    const socket=io("https://caimera-2.onrender.com/")
+    const socket=io("https://caimera-4.onrender.com")
 
     console.log(socket);
 
