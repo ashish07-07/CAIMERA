@@ -157,9 +157,15 @@ io.on("connection", (socket) => {
             "congrajulation u gave the correct answer"
           );
 
-          const existingScore = await prisma.score.findUnique({
-            where: { userId: parsedUserId },
-          });
+          // const existingScore = await prisma.score.findUnique({
+          //   where: { userId: parsedUserId },
+          // });
+
+          const existingScore = await prisma.score.findFirst({
+  where: { 
+    userId: parsedUserId 
+  },
+});
 
           if (existingScore) {
             await prisma.score.update({

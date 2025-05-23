@@ -41,9 +41,19 @@ model User {
   scores   Score[]  
 }
 
+// model Score {
+//   id     Int   @id @default(autoincrement())
+//   userId Int
+//   score  Int   @default(0)
+//   user   User  @relation(fields: [userId], references: [id])
+// }
+
 model Score {
   id     Int   @id @default(autoincrement())
   userId Int
   score  Int   @default(0)
   user   User  @relation(fields: [userId], references: [id])
+  
+  // Add unique composite index (if needed)
+  @@unique([userId, id])
 }
