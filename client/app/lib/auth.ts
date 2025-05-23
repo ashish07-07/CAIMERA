@@ -155,46 +155,117 @@
 // export { handler as GET, handler as POST };
 
 
+// import NextAuth from "next-auth";
+// import CredentialsProvider from "next-auth/providers/credentials";
+// import bcrypt from "bcrypt";
+// import axios from "axios";
+
+// export const NEXT_AUTH = {
+//   providers: [
+//     CredentialsProvider({
+//       name: "Credentials",
+//       credentials: {
+//         email: { label: "Email", type: "email", placeholder: "you@example.com" },
+//         password: { label: "Password", type: "password" },
+//       },
+//       async authorize(credentials: any) {
+//         const { email, password } = credentials;
+
+//         try {
+//           // 👉 Corrected to use getuserbyemail route
+//           const res = await axios.post("https://caimera-2.onrender.com/user/getuserbyemail", {
+//             email,
+//           });
+
+//           const user = res.data?.user;
+
+//           if (!user) {
+//             console.error("No user found with email");
+//             return null;
+//           }
+
+//           // Compare the password
+//           const isValidPassword = await bcrypt.compare(password, user.password);
+//           if (!isValidPassword) {
+//             console.error("Invalid password");
+//             return null;
+//           }
+
+//           return {
+//             id: user.id.toString(),
+//             email: user.email,
+//             name: user.name,
+//           };
+//         } catch (error) {
+//           console.error("Auth error:", error);
+//           return null;
+//         }
+//       },
+//     }),
+//   ],
+
+//   // ✅ Let NextAuth use its default pages
+//   // Don't define `pages: { signIn: ... }` if you want the default UI
+//   secret: process.env.NEXTAUTH_SECRET,
+
+//   callbacks: {
+//     async jwt({ token, user }: any) {
+//       if (user) {
+//         token.id = user.id;
+//         token.name = user.name;
+//       }
+//       return token;
+//     },
+//     async session({ token, session }: any) {
+//       if (token) {
+//         session.user.id = token.id;
+//         session.user.name = token.name;
+//       }
+//       return session;
+//     },
+//   },
+// };
+
+
+// pages/api/auth/[...nextauth].ts
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcrypt";
 import axios from "axios";
+import bcrypt from "bcrypt";
 
-export const NEXT_AUTH = {
+const handler = NextAuth({
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "you@example.com" },
+        email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any) {
-        const { email, password } = credentials;
-
         try {
-          // 👉 Corrected to use getuserbyemail route
-          const res = await axios.post("https://caimera-2.onrender.com/user/getuserbyemail", {
-            email,
+          const res = await axios.post("http://localhost:3000/user/getuserbyemail", {
+            email: credentials.email,
           });
 
-          const user = res.data?.user;
+          const user = res.data.user;
 
-          if (!user) {
-            console.error("No user found with email");
+          if (!user) return null;
+
+          const isPasswordCorrect = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (!isPasswordCorrect) {
+            console.error("Wrong password");
             return null;
           }
 
-          // Compare the password
-          const isValidPassword = await bcrypt.compare(password, user.password);
-          if (!isValidPassword) {
-            console.error("Invalid password");
-            return null;
-          }
-
+          // Do not return password
           return {
-            id: user.id.toString(),
-            email: user.email,
+            id: user.id,
             name: user.name,
+            email: user.email,
           };
         } catch (error) {
           console.error("Auth error:", error);
@@ -203,25 +274,13 @@ export const NEXT_AUTH = {
       },
     }),
   ],
-
-  // ✅ Let NextAuth use its default pages
-  // Don't define `pages: { signIn: ... }` if you want the default UI
-  secret: process.env.NEXTAUTH_SECRET,
-
-  callbacks: {
-    async jwt({ token, user }: any) {
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-      }
-      return token;
-    },
-    async session({ token, session }: any) {
-      if (token) {
-        session.user.id = token.id;
-        session.user.name = token.name;
-      }
-      return session;
-    },
+  session: {
+    strategy: "jwt",
   },
-};
+  pages: {
+    signIn: "/signin",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+});
+
+export { handler as GET, handler as POST };

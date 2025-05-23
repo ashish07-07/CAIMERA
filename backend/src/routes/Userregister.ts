@@ -49,7 +49,7 @@ const router = express.Router();
 router.use(express.json());
 
 // Registration Route (optional, but useful if you're handling sign-ups)
-router.post("/userregistration", async (req: Request, res: Response) => {
+router.post("/userregistration", async (req:any, res:any) => {
   const { name, email, password }: Userdetails = req.body;
 
   try {
