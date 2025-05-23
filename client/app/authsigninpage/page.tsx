@@ -96,15 +96,130 @@
 
 
 
+// "use client";
+// import { useState } from 'react';
+// import { signIn } from 'next-auth/react';
+// import { useRouter } from 'next/navigation';
+// import axios from 'axios';
+
+// export default function SignInPage() {
+//   const router = useRouter();
+//   const [isRegistering, setIsRegistering] = useState(false);
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     email: '',
+//     password: '',
+//   });
+//   const [error, setError] = useState('');
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     setError('');
+
+//     try {
+//       if (isRegistering) {
+//         // Handle registration
+//         await axios.post('/api/register', {
+//           name: formData.name,
+//           email: formData.email,
+//           password: formData.password
+//         });
+//       }
+
+//       // Handle login
+//       const result = await signIn('credentials', {
+//         redirect: false,
+//         email: formData.email,
+//         password: formData.password
+//       });
+
+//       if (result?.error) {
+//         setError(result.error);
+//       } else {
+//         router.push('/');
+//       }
+//     } catch (err: any) {
+//       setError(err.response?.data?.error || 'Something went wrong');
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+//       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-96">
+//         <h1 className="text-2xl font-bold mb-6 text-center">
+//           {isRegistering ? 'Register' : 'Sign In'}
+//         </h1>
+
+//         {error && (
+//           <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>
+//         )}
+
+//         {isRegistering && (
+//           <div className="mb-4">
+//             <label className="block text-sm font-medium mb-1">Name</label>
+//             <input
+//               type="text"
+//               value={formData.name}
+//               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+//               className="w-full p-2 border rounded"
+//               required
+//             />
+//           </div>
+//         )}
+
+//         <div className="mb-4">
+//           <label className="block text-sm font-medium mb-1">Email</label>
+//           <input
+//             type="email"
+//             value={formData.email}
+//             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+//             className="w-full p-2 border rounded"
+//             required
+//           />
+//         </div>
+
+//         <div className="mb-6">
+//           <label className="block text-sm font-medium mb-1">Password</label>
+//           <input
+//             type="password"
+//             value={formData.password}
+//             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+//             className="w-full p-2 border rounded"
+//             required
+//           />
+//         </div>
+
+//         <button
+//           type="submit"
+//           className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mb-4"
+//         >
+//           {isRegistering ? 'Register' : 'Sign In'}
+//         </button>
+
+//         <button
+//           type="button"
+//           className="text-sm text-blue-600 hover:underline"
+//           onClick={() => setIsRegistering(!isRegistering)}
+//         >
+//           {isRegistering
+//             ? 'Already have an account? Sign In'
+//             : 'Need an account? Register'}
+//         </button>
+//       </form>
+//     </div>
+//   );
+// }
+
+
+
+
 "use client";
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const router = useRouter();
-  const [isRegistering, setIsRegistering] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -117,29 +232,22 @@ export default function SignInPage() {
     setError('');
 
     try {
-      if (isRegistering) {
-        // Handle registration
-        await axios.post('/api/register', {
+      // Directly call your backend signup endpoint
+      const response = await axios.post(
+        'https://caimera-4.onrender.com/user/userregistration',
+        {
           name: formData.name,
           email: formData.email,
           password: formData.password
-        });
-      }
+        }
+      );
 
-      // Handle login
-      const result = await signIn('credentials', {
-        redirect: false,
-        email: formData.email,
-        password: formData.password
-      });
-
-      if (result?.error) {
-        setError(result.error);
-      } else {
+      // If registration successful, redirect to home
+      if (response.status === 201) {
         router.push('/');
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Something went wrong');
+      setError(err.response?.data?.error || 'Registration failed');
     }
   };
 
@@ -147,25 +255,23 @@ export default function SignInPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-96">
         <h1 className="text-2xl font-bold mb-6 text-center">
-          {isRegistering ? 'Register' : 'Sign In'}
+          Create Account
         </h1>
 
         {error && (
           <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>
         )}
 
-        {isRegistering && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Name</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-        )}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Name</label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
 
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Email</label>
@@ -191,19 +297,9 @@ export default function SignInPage() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mb-4"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
         >
-          {isRegistering ? 'Register' : 'Sign In'}
-        </button>
-
-        <button
-          type="button"
-          className="text-sm text-blue-600 hover:underline"
-          onClick={() => setIsRegistering(!isRegistering)}
-        >
-          {isRegistering
-            ? 'Already have an account? Sign In'
-            : 'Need an account? Register'}
+          Sign Up
         </button>
       </form>
     </div>
