@@ -250,6 +250,7 @@ router.post("/userregistration", async (req:any, res:any) => {
     }
 
     // Check existing user
+    // @ts-ignore
     const existingUser = await prisma.user.findUnique({
       where: { 
         email: email 
